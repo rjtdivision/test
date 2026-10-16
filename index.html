@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A1F3C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2FBFC; --surface:#FFFFFF; --text:#0A1F3C; --muted:#4F6580;
+  --accent:#00B4C6; --accent-ink:#06223F; --line:#CFE6EA; --danger:#B3261E;
+}
+:root[data-theme="dark"]{
+  --bg:#0A1F3C; --surface:#10294D; --text:#EAF9FB; --muted:#9DB6CC;
+  --accent:#22D3E6; --accent-ink:#06223F; --line:#1E3B63; --danger:#FF8A80;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  transition:background .25s,color .25s;overflow:hidden;
+}
+h1,h2,.brand{font-family:Sora,Inter,system-ui,sans-serif}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* Splash */
+#splash{align-items:center;justify-content:center;background:#0A1F3C;color:#EAF9FB;z-index:10;gap:22px}
+#splash.hide{opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s}
+.ring{width:96px;height:96px;border-radius:50%;border:6px solid #1E3B63;border-top-color:#22D3E6;animation:spin 1s linear infinite}
+.splash-name{font-size:1.5rem;font-weight:700;letter-spacing:.02em}
+.bar{width:160px;height:4px;background:#1E3B63;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#22D3E6;animation:fill 3s linear forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fill{to{width:100%}}
+
+/* Top bar */
+.top{display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:700;font-size:1.1rem;color:var(--text)}
+.icon-btn{
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);color:var(--text);cursor:pointer;font-size:1.15rem;
+  display:grid;place-items:center;
+}
+.icon-btn:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Login */
+.center{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto}
+h1{font-size:clamp(2rem,8vw,2.75rem);line-height:1.1;margin-bottom:10px}
+.lead{color:var(--muted);margin-bottom:28px;line-height:1.5}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:52px;
+  border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--text);
+  font:500 1rem Inter,system-ui,sans-serif;cursor:pointer;
+}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
+.btn[disabled]{opacity:.6;cursor:wait}
+.err{color:var(--danger);margin-top:14px;min-height:1.4em;font-size:.95rem}
+
+/* Home */
+.welcome-label{color:var(--muted);margin-bottom:6px}
+.email{
+  display:inline-block;margin:14px 0 6px;padding:12px 16px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);
+  font-weight:500;word-break:break-all;
+}
+.date{color:var(--muted);font-size:.9rem;margin-bottom:28px}
+</style>
+</head>
+<body>
+
+<section id="splash" class="screen active" aria-label="Loading">
+  <div class="ring"></div>
+  <div class="splash-name">Login</div>
+  <div class="bar"><i></i></div>
+</section>
+
+<section id="login" class="screen">
+  <div class="top">
+    <span class="brand">Login</span>
+    <button class="icon-btn" data-theme-toggle aria-label="Switch light or dark theme">☾</button>
+  </div>
+  <div class="center">
+    <h1>Sign in</h1>
+    <p class="lead">Use your Gmail account to continue.</p>
+    <button class="btn primary" id="googleBtn">
+      <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C1 16.4 0 20.1 0 24s1 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2.1 1.4-4.7 2.3-7.7 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+      <span>Sign in with Google</span>
+    </button>
+    <p class="err" id="err" role="alert"></p>
+  </div>
+</section>
+
+<section id="home" class="screen">
+  <div class="top">
+    <span class="brand">Home</span>
+    <button class="icon-btn" data-theme-toggle aria-label="Switch light or dark theme">☾</button>
+  </div>
+  <div class="center">
+    <p class="welcome-label">Authentication successful</p>
+    <h1>Welcome</h1>
+    <div class="email" id="userEmail"></div>
+    <p class="date" id="today"></p>
+    <button class="btn" id="signOutBtn">Sign out</button>
+  </div>
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVVp1dd4OCEhXgyGVmKMjQNswKvX6oPqU",
+  authDomain: "login-4ef9c.firebaseapp.com",
+  projectId: "login-4ef9c",
+  storageBucket: "login-4ef9c.firebasestorage.app",
+  messagingSenderId: "675553256314",
+  appId: "1:675553256314:web:de2fa268c867bbe0252cc3"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: "select_account" });
+
+const $ = id => document.getElementById(id);
+const screens = ["splash","login","home"];
+function show(id){ screens.forEach(s => $(s).classList.toggle("active", s === id)); }
+
+/* Theme */
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  document.querySelectorAll("[data-theme-toggle]").forEach(b => b.textContent = t === "dark" ? "☀" : "☾");
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "dark" ? "#0A1F3C" : "#F2FBFC");
+}
+let theme = "dark";
+try { theme = localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"); } catch(e){}
+applyTheme(theme);
+document.querySelectorAll("[data-theme-toggle]").forEach(b => b.addEventListener("click", () => {
+  theme = theme === "dark" ? "light" : "dark";
+  applyTheme(theme);
+  try { localStorage.setItem("theme", theme); } catch(e){}
+}));
+
+/* Date as DD/MM/YYYY */
+function todayDDMMYYYY(){
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+/* Auth */
+let splashDone = false, authUser, authReady = false;
+function route(){
+  if (!splashDone || !authReady) return;
+  $("splash").classList.add("hide");
+  setTimeout(() => $("splash").style.display = "none", 450);
+  if (authUser){
+    $("userEmail").textContent = authUser.email;
+    $("today").textContent = "Signed in on " + todayDDMMYYYY();
+    show("home");
+  } else {
+    show("login");
+  }
+}
+setTimeout(() => { splashDone = true; route(); }, 3000);
+onAuthStateChanged(auth, user => { authUser = user; authReady = true; route(); });
+
+$("googleBtn").addEventListener("click", async () => {
+  const btn = $("googleBtn"); $("err").textContent = "";
+  btn.disabled = true;
+  try { await signInWithPopup(auth, provider); }
+  catch (e) {
+    const msgs = {
+      "auth/popup-blocked": "The sign-in popup was blocked. Allow popups for this site and try again.",
+      "auth/popup-closed-by-user": "Sign-in was cancelled. Tap the button to try again.",
+      "auth/unauthorized-domain": "This domain is not authorised. Add it under Authentication > Settings > Authorized domains in Firebase.",
+      "auth/operation-not-allowed": "Google sign-in is not enabled. Enable it under Authentication > Sign-in method in Firebase.",
+      "auth/network-request-failed": "No internet connection. Check your network and try again."
+    };
+    $("err").textContent = msgs[e.code] || "Sign-in failed. Please try again.";
+  } finally { btn.disabled = false; }
+});
+
+$("signOutBtn").addEventListener("click", () => signOut(auth));
+</script>
+</body>
+</html>
