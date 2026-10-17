@@ -290,6 +290,25 @@ main:has(.glist.pl:not([hidden])){padding:4px}
 #auth form[hidden]{display:none}
 #auth .urow .gbtn.pri{width:auto}
 #auth select.gin{text-transform:uppercase}
+#auth .afp{display:flex;justify-content:flex-end;margin-top:-4px}
+#auth .afp button{all:unset;cursor:pointer;color:var(--ct);font-size:11.5px;font-weight:800;letter-spacing:.08em;-webkit-tap-highlight-color:transparent}
+#auth .afp button:focus-visible,#auth .nslnk:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+#auth .ahint{margin:0;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--muted);line-height:1.5}
+#auth .nslnk{all:unset;cursor:pointer;color:var(--ct);font-size:11.5px;font-weight:800;letter-spacing:.08em;align-self:flex-start;-webkit-tap-highlight-color:transparent}
+#auth .nsb{display:flex;flex-direction:column;gap:12px;padding:14px 12px;border:1px dashed var(--line);border-radius:14px;background:rgba(0,209,240,.05)}
+#auth .nsb[hidden]{display:none}
+#auth .nsb h4{margin:0;font-size:12px;letter-spacing:.14em;color:var(--ct)}
+#auth .nsb .gin{min-width:0}
+#auth .nsb .lrow{display:flex;gap:8px}
+#auth .nsb .lrow .gin{flex:1}
+#auth .nsb .rg{display:flex;flex-wrap:wrap;gap:8px}
+#auth .nsb .tr{display:flex;gap:8px}
+#auth .nsb .tr input{flex:1}
+#cpBtn{margin-left:2px}
+@media (max-width:600px){#cpBtn{width:34px;height:34px}}
+#tcf .cpf{display:flex;flex-direction:column;gap:12px;text-align:left}
+#tcf .cpf .urow{display:flex;gap:10px}
+#tcf .cpf .urow .gbtn{flex:1}
 </style>
 </head>
 <body>
@@ -313,17 +332,40 @@ main:has(.glist.pl:not([hidden])){padding:4px}
    <div class="fld"><label class="stl" for="apw">PASSWORD</label>
     <div class="dwrap"><input id="apw" class="gin" type="password" name="password" autocomplete="current-password" maxlength="40" placeholder="ENTER PASSWORD">
      <button type="button" class="ebtn" id="ape" aria-label="Show or hide password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+   <div class="afp"><button type="button" id="afp">FORGOT PASSWORD?</button></div>
    <div id="am" class="umsg"></div>
    <button type="submit" class="gbtn pri" id="alb">LOGIN</button>
    <div class="aor"><i></i><span>OR</span><i></i></div>
    <button type="button" class="gbtn ggl" id="agl"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.5-4.1 7-10.2 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg><span>SIGN IN / SIGN UP WITH GOOGLE</span></button>
    <div class="alnk"><span>NEW USER?</span><button type="button" id="asu">CREATE ACCOUNT</button></div>
   </form>
+  <form id="rf" class="gpanel" hidden autocomplete="off" novalidate>
+   <h3>RESET PASSWORD</h3>
+   <div class="fld"><div class="stl">GOOGLE ACCOUNT</div><input id="rem" class="gina" type="text" readonly></div>
+   <p class="ahint">IDENTITY VERIFIED WITH GOOGLE. SET A NEW PASSWORD (6 TO 40 CHARACTERS).</p>
+   <div class="fld"><label class="stl" for="rp1">NEW PASSWORD</label><input id="rp1" class="gin" type="password" autocomplete="new-password" maxlength="40" placeholder="MIN. 6 CHARACTERS"></div>
+   <div class="fld"><label class="stl" for="rp2">CONFIRM PASSWORD</label><input id="rp2" class="gin" type="password" autocomplete="new-password" maxlength="40" placeholder="RE-ENTER PASSWORD"></div>
+   <div id="rm" class="umsg"></div>
+   <div class="urow"><button type="button" class="gbtn" id="rcn">CANCEL</button><button type="submit" class="gbtn pri" id="rsb">UPDATE PASSWORD</button></div>
+  </form>
   <form id="sf" class="gpanel" hidden autocomplete="off" novalidate>
    <h3>SIGN UP</h3>
    <div class="fld"><div class="stl">GOOGLE ACCOUNT</div><input id="sem" class="gina" type="text" readonly></div>
    <div class="fld"><label class="stl" for="snm">NAME</label><input id="snm" class="gin" type="text" maxlength="40" autocomplete="off" autocapitalize="characters"></div>
    <div class="fld"><label class="stl" for="sst">SELECT YOUR STATION</label><select id="sst" class="gin"></select></div>
+   <button type="button" class="nslnk" id="nst" aria-expanded="false">+ MY STATION IS NOT LISTED - ADD IT</button>
+   <div class="nsb" id="nsb" hidden>
+    <h4>NEW STATION PROFILE</h4>
+    <div class="fld"><label class="stl" for="nsc">STATION CODE</label><input id="nsc" class="gin" type="text" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="E.G. RJT"></div>
+    <div class="fld"><label class="stl" for="nsn">STATION NAME</label><input id="nsn" class="gin" type="text" maxlength="40" autocapitalize="characters" autocomplete="off"></div>
+    <div class="fld"><label class="stl" for="nsd">DISTRICT</label><select id="nsd" class="gin"></select></div>
+    <div class="fld"><label class="stl" for="nsy">TYPE</label><select id="nsy" class="gin"></select></div>
+    <div class="fld"><div class="stl">WORKING HOURS</div><div class="rg" id="nsw"></div>
+     <div class="tr" id="nst2" style="display:none"><input id="nsf" class="gin" type="time"><input id="nsto" class="gin" type="time"></div></div>
+    <div class="fld"><div class="stl">OUTWARD LINES</div><div id="nso" class="lcol"></div></div>
+    <div class="fld"><div class="stl">INWARD LINES</div><div id="nsi" class="lcol"></div></div>
+    <p class="ahint">ADD AT LEAST ONE OUTWARD OR INWARD LINE. YOU CAN EDIT THE PROFILE LATER FROM STATION PROFILE.</p>
+   </div>
    <div class="fld"><label class="stl" for="sp1">SET PASSWORD</label><input id="sp1" class="gin" type="password" autocomplete="new-password" maxlength="40" placeholder="MIN. 6 CHARACTERS"></div>
    <div class="fld"><label class="stl" for="sp2">CONFIRM PASSWORD</label><input id="sp2" class="gin" type="password" autocomplete="new-password" maxlength="40" placeholder="RE-ENTER PASSWORD"></div>
    <div id="sm" class="umsg"></div>
@@ -336,6 +378,7 @@ main:has(.glist.pl:not([hidden])){padding:4px}
   <span class="plate"><div class="logo lg-l" role="img" aria-label="Indian Railways"></div><div class="logo lg-d" role="img" aria-label="Indian Railways"></div></span>
   <div class="t"><b id="hb1">RAJKOT DIVISION</b><small class="sd">COMMERCIAL DEPARTMENT (GOODS)</small><small class="sm" id="hb2">COMMERCIAL DEPARTMENT</small><small class="sm" id="hb3">GOODS</small></div>
   <span class="date" id="date"></span>
+  <button id="cpBtn" class="hb" type="button" aria-label="Change password" title="Change password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
   <button id="outBtn" class="hb" type="button" aria-label="Logout" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button>
   <button id="themeBtn" aria-label="Change theme"></button>
  </header>
@@ -1447,9 +1490,9 @@ fhPull();
 var AUTH_API=STATION_API;   // login runs on the same merged Apps Script as Station Profile
 var G_CLIENT_ID='675553256314-hbv9ibguh47cjupnq8j77keb4jjlar8q.apps.googleusercontent.com';        // PASTE: Google OAuth Client ID (xxxx.apps.googleusercontent.com)
 var AUTH_REMEMBER=false;   // false = user must login on every page load
-var USER=null,AU={tok:'',tc:null};
+var USER=null,AU={tok:'',tc:null,mode:'login'};
 function $a(x){return document.getElementById(x)}
-function authMsg(t,e){var m=$a($a('sf').hidden?'am':'sm');if(m){m.textContent=t;m.className='umsg'+(e?' err':'')}}
+function authMsg(t,e){var m=$a(!$a('sf').hidden?'sm':!$a('rf').hidden?'rm':'am');if(m){m.textContent=t;m.className='umsg'+(e?' err':'')}}
 function aOn(){return /^https:\/\//.test(AUTH_API)}
 function aPost(b){
  if(!aOn())return Promise.reject(new Error('SRV:LOGIN SERVER NOT CONNECTED'));
@@ -1470,7 +1513,7 @@ function enterApp(u){
 }
 function authOk(u){
  if(AUTH_REMEMBER){try{localStorage.setItem('authUser',JSON.stringify(u))}catch(e){}}
- ['aid','apw','sp1','sp2'].forEach(function(k){$a(k).value=''});
+ ['aid','apw','sp1','sp2','rp1','rp2'].forEach(function(k){$a(k).value=''});
  enterApp(u);
 }
 function gLoad(){
@@ -1480,7 +1523,7 @@ function gLoad(){
  s.onerror=function(){s.remove()};document.head.appendChild(s);
 }
 function showAuth(){
- $a('app').hidden=true;$a('auth').hidden=false;$a('sf').hidden=true;$a('lf').hidden=false;
+ $a('app').hidden=true;$a('auth').hidden=false;$a('sf').hidden=true;$a('rf').hidden=true;$a('lf').hidden=false;AU.mode='login';nsClose();
  $a('apw').value='';$a('apw').type='password';$a('ape').classList.remove('on');AU.tok='';authMsg('');
  gLoad();
  setTimeout(function(){$a('aid').focus()},60);
@@ -1490,7 +1533,8 @@ function doLogout(){
  USER=null;UW={rows:[]};
  SF=[{t:'HOME',s:''}];C=0;render(SF[0]);showAuth();
 }
-function gStart(){
+function gStart(mode){
+ AU.mode=mode==='reset'?'reset':'login';
  if(!aOn()||G_CLIENT_ID.indexOf('.apps.googleusercontent.com')<0){authMsg('GOOGLE LOGIN NOT CONNECTED',true);return}
  if(!(window.google&&google.accounts&&google.accounts.oauth2)){authMsg('GOOGLE IS LOADING - TRY AGAIN IN A MOMENT',true);gLoad();return}
  authMsg('');
@@ -1500,6 +1544,14 @@ function gStart(){
 function gTok(r){
  if(!r||!r.access_token){authMsg('GOOGLE SIGN-IN FAILED',true);return}
  AU.tok=r.access_token;authMsg('CHECKING...');
+ if(AU.mode==='reset'){
+  aPost({action:'resetCheck',token:AU.tok}).then(function(j){
+   if(!j.exists){authMsg('NO ACCOUNT FOUND FOR THIS GOOGLE ID - CREATE ACCOUNT',true);return}
+   $a('lf').hidden=true;$a('rf').hidden=false;$a('rem').value=j.email||'';$a('rp1').value='';$a('rp2').value='';authMsg('');
+   setTimeout(function(){$a('rp1').focus()},60);
+  }).catch(function(x){authMsg(aErr(x),true)});
+  return;
+ }
  aPost({action:'gcheck',token:AU.tok}).then(function(j){
   if(j.exists)authOk(j.user);else signupShow(j);
  }).catch(function(x){authMsg(aErr(x),true)});
@@ -1509,8 +1561,88 @@ function signupShow(j){
  $a('sem').value=j.email||'';$a('snm').value=String(j.name||'').toUpperCase();
  var st=j.stations||[];
  $a('sst').innerHTML='<option value="" selected disabled>'+(st.length?'SELECT YOUR STATION':'NO STATION PROFILE FOUND')+'</option>'+st.map(function(s){return '<option value="'+esc(s.code)+'">'+esc(s.code+' - '+s.name)+'</option>'}).join('');
- $a('sp1').value='';$a('sp2').value='';
- authMsg(st.length?'NEW USER - COMPLETE YOUR REGISTRATION':'ASK ADMIN TO CREATE STATION PROFILE FIRST',!st.length);
+ $a('sp1').value='';$a('sp2').value='';nsClose();
+ authMsg('NEW USER - COMPLETE YOUR REGISTRATION');
+}
+
+// ---- extra account features: eye toggles, new-station block, change password
+var EYE_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+function pwEye(i){
+ if(!i||i.parentNode.classList.contains('dwrap'))return;
+ var w=document.createElement('div');w.className='dwrap';i.parentNode.insertBefore(w,i);w.appendChild(i);
+ var b=document.createElement('button');b.type='button';b.className='ebtn';b.setAttribute('aria-label','Show or hide password');b.innerHTML=EYE_SVG;
+ b.onclick=function(){var s=i.type==='password';i.type=s?'text':'password';b.classList.toggle('on',s)};
+ w.appendChild(b);
+}
+function nsOpen(){return !$a('nsb').hidden}
+function nsClose(){
+ var b=$a('nsb');if(!b)return;
+ b.hidden=true;$a('nst').setAttribute('aria-expanded','false');$a('nst').textContent='+ MY STATION IS NOT LISTED - ADD IT';$a('sst').disabled=false;
+}
+function nsToggle(){
+ if(nsOpen()){nsClose();return}
+ var b=$a('nsb');b.hidden=false;$a('nst').setAttribute('aria-expanded','true');$a('nst').textContent='- SELECT FROM LIST INSTEAD';$a('sst').disabled=true;
+ if(!$a('nsd').options.length){
+  $a('nsd').innerHTML='<option value="" selected disabled>SELECT DISTRICT</option>'+GJ_DISTRICTS.map(function(x){return '<option>'+esc(x)+'</option>'}).join('');
+  $a('nsy').innerHTML='<option value="" selected disabled>SELECT TYPE</option>'+STN_TYPES.map(function(x){return '<option>'+esc(x)+'</option>'}).join('');
+  $a('nsw').innerHTML=ropts('nswh',['24 HRS.','OTHER'],0);
+  [].forEach.call($a('nsw').querySelectorAll('input'),function(r){r.onchange=function(){
+   var on=document.querySelector('input[name=nswh]:checked').value==='OTHER';$a('nst2').style.display=on?'flex':'none';
+   if(on&&!$a('nsf').value&&!$a('nsto').value){$a('nsf').value='06:00';$a('nsto').value='22:00'}}});
+  spLines('nso',[]);spLines('nsi',[]);
+  $a('nsc').oninput=function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')};
+  $a('nsn').oninput=function(){this.value=this.value.toUpperCase()};
+ }
+ setTimeout(function(){$a('nsc').focus()},60);
+}
+function nsRead(){
+ var tm=/^([01]\d|2[0-3]):[0-5]\d$/,code=$a('nsc').value.trim().toUpperCase(),name=$a('nsn').value.trim().replace(/\s+/g,' '),dist=$a('nsd').value,ty=$a('nsy').value;
+ if(!/^[A-Z0-9]{2,6}$/.test(code))return 'STATION CODE: 2 TO 6 LETTERS/NUMBERS';
+ if(!name)return 'ENTER STATION NAME';
+ if(!dist)return 'SELECT DISTRICT';
+ if(!ty)return 'SELECT TYPE';
+ var w=document.querySelector('input[name=nswh]:checked'),hrs='24 HRS.';
+ if(w&&w.value==='OTHER'){
+  var f=$a('nsf').value.trim(),t=$a('nsto').value.trim();
+  if(!tm.test(f)||!tm.test(t))return 'ENTER FROM / TO TIME';
+  if(f===t)return 'FROM AND TO TIME CANNOT BE SAME';
+  hrs=f+'-'+t;
+ }
+ var o=spGetLines('nso'),i=spGetLines('nsi'),dup=function(a){return a.some(function(v,k){return a.indexOf(v)!==k})};
+ if(dup(o))return 'DUPLICATE LINE NO. IN OUTWARD LINES';
+ if(dup(i))return 'DUPLICATE LINE NO. IN INWARD LINES';
+ if(!o.length&&!i.length)return 'ADD AT LEAST ONE OUTWARD OR INWARD LINE';
+ return {STATION_CODE:code,STATION_NAME:name.toUpperCase(),DISTRICT:dist,TYPE:ty,WORKING_HOURS:hrs,OUTWARD_LINES:o,INWARD_LINES:i};
+}
+function cpOpen(){
+ if(!USER)return;
+ var o=document.getElementById('tcf');
+ if(!o){o=document.createElement('div');o.id='tcf';document.body.appendChild(o)}
+ o.innerHTML='<div class=dc role=dialog aria-modal=true aria-labelledby=cpT><div class=di><svg viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=2.4 stroke-linecap=round stroke-linejoin=round><rect x=4 y=11 width=16 height=10 rx=2></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></div><h3 id=cpT>CHANGE PASSWORD</h3><p>'+esc(USER.email||'')+'</p>'
+ +'<form class=cpf id=cpForm autocomplete=off novalidate>'
+ +'<div class=fld><label class=stl for=cpo>CURRENT PASSWORD</label><input id=cpo class=gin type=password autocomplete=current-password maxlength=40></div>'
+ +'<div class=fld><label class=stl for=cpn>NEW PASSWORD</label><input id=cpn class=gin type=password autocomplete=new-password maxlength=40 placeholder="MIN. 6 CHARACTERS"></div>'
+ +'<div class=fld><label class=stl for=cpc>CONFIRM NEW PASSWORD</label><input id=cpc class=gin type=password autocomplete=new-password maxlength=40></div>'
+ +'<div id=cpm class=umsg></div><div class=urow><button type=button class=gbtn id=cpx>CANCEL</button><button type=submit class="gbtn pri" id=cpk>UPDATE</button></div></form></div>';
+ o.hidden=false;
+ var g=function(x){return document.getElementById(x)},close=function(){o.hidden=true;o.innerHTML=''};
+ ['cpo','cpn','cpc'].forEach(function(k){pwEye(g(k))});
+ var msg=function(t,e){var m=g('cpm');m.textContent=t;m.className='umsg'+(e?' err':'')};
+ g('cpx').onclick=close;
+ o.onclick=function(e){if(e.target===o&&!g('cpk').disabled)close()};
+ g('cpForm').onsubmit=function(e){
+  e.preventDefault();
+  var a=g('cpo').value,n=g('cpn').value,c=g('cpc').value,b=g('cpk');
+  if(!a){msg('ENTER CURRENT PASSWORD',true);return}
+  if(n.length<6||n.length>40){msg('NEW PASSWORD MUST BE 6 TO 40 CHARACTERS',true);return}
+  if(n===a){msg('NEW PASSWORD MUST BE DIFFERENT',true);return}
+  if(n!==c){msg('PASSWORDS DO NOT MATCH',true);return}
+  b.disabled=true;g('cpx').disabled=true;msg('UPDATING...');
+  aPost({action:'changePassword',id:USER.email,oldPassword:a,newPassword:n}).then(function(){
+   msg('PASSWORD CHANGED SUCCESSFULLY');setTimeout(close,1200);
+  }).catch(function(x){msg(aErr(x),true);b.disabled=false;g('cpx').disabled=false});
+ };
+ setTimeout(function(){g('cpo').focus()},60);
 }
 function bindAuth(){
  $a('lf').onsubmit=function(e){
@@ -1524,18 +1656,32 @@ function bindAuth(){
  };
  $a('sf').onsubmit=function(e){
   e.preventDefault();
-  var st=$a('sst').value,p1=$a('sp1').value,p2=$a('sp2').value,nm=$a('snm').value.trim(),b=$a('ssb2');
+  var st=$a('sst').value,p1=$a('sp1').value,p2=$a('sp2').value,nm=$a('snm').value.trim(),b=$a('ssb2'),ns=null;
   if(!nm){authMsg('ENTER YOUR NAME',true);return}
-  if(!st){authMsg('SELECT YOUR STATION',true);return}
+  if(nsOpen()){ns=nsRead();if(typeof ns==='string'){authMsg(ns,true);return}}
+  else if(!st){authMsg('SELECT YOUR STATION',true);return}
   if(p1.length<6){authMsg('PASSWORD MUST BE AT LEAST 6 CHARACTERS',true);return}
   if(p1!==p2){authMsg('PASSWORDS DO NOT MATCH',true);return}
   b.disabled=true;authMsg('REGISTERING...');
-  aPost({action:'register',token:AU.tok,name:nm,station:st,password:p1}).then(function(j){authOk(j.user)}).catch(function(x){authMsg(aErr(x),true)}).then(function(){b.disabled=false});
+  aPost(ns?{action:'register',token:AU.tok,name:nm,newStation:ns,password:p1}:{action:'register',token:AU.tok,name:nm,station:st,password:p1}).then(function(j){authOk(j.user)}).catch(function(x){authMsg(aErr(x),true)}).then(function(){b.disabled=false});
  };
  $a('scn').onclick=showAuth;
  $a('ape').onclick=function(){var p=$a('apw'),s=p.type==='password';p.type=s?'text':'password';this.classList.toggle('on',s)};
- $a('asu').onclick=gStart;
- $a('agl').onclick=gStart;
+ $a('asu').onclick=function(){gStart('login')};
+ $a('agl').onclick=function(){gStart('login')};
+ $a('afp').onclick=function(){gStart('reset')};
+ $a('nst').onclick=nsToggle;
+ ['sp1','sp2','rp1','rp2'].forEach(function(k){pwEye($a(k))});
+ $a('rcn').onclick=showAuth;
+ $a('cpBtn').onclick=cpOpen;
+ $a('rf').onsubmit=function(e){
+  e.preventDefault();
+  var p1=$a('rp1').value,p2=$a('rp2').value,b=$a('rsb');
+  if(p1.length<6||p1.length>40){authMsg('PASSWORD MUST BE 6 TO 40 CHARACTERS',true);return}
+  if(p1!==p2){authMsg('PASSWORDS DO NOT MATCH',true);return}
+  b.disabled=true;authMsg('UPDATING...');
+  aPost({action:'resetPassword',token:AU.tok,password:p1}).then(function(j){authOk(j.user)}).catch(function(x){authMsg(aErr(x),true)}).then(function(){b.disabled=false});
+ };
  $a('outBtn').onclick=doLogout;
 }
 bindAuth();
