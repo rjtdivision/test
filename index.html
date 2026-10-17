@@ -305,6 +305,14 @@ main:has(.glist.pl:not([hidden])){padding:4px}
 #auth .nsb .tr{display:flex;gap:8px}
 #auth .nsb .tr input{flex:1}
 #cpBtn{margin-left:2px}
+.alb{display:flex;gap:8px;align-items:center}.alb .gin{flex:1;min-width:0}
+.alw{overflow:auto;max-height:62vh;border:1px solid var(--line);border-radius:12px}
+.alt{width:100%;border-collapse:collapse;font-size:11.5px;font-weight:600;letter-spacing:.03em}
+.alt th{position:sticky;top:0;background:var(--surface);text-align:left;padding:8px 10px;font-size:10px;letter-spacing:.12em;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+.alt td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.alt td.t,.alt td.i{white-space:nowrap}
+.alt tr.adm td{background:rgba(0,209,240,.08)}.alt tr.bad td{color:#E5484D}
+.alc{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
 @media (max-width:600px){#cpBtn{width:34px;height:34px}}
 #tcf .cpf{display:flex;flex-direction:column;gap:12px;text-align:left}
 #tcf .cpf .urow{display:flex;gap:10px}
@@ -423,11 +431,13 @@ function updateBack(){
 }
 function hpush(s){SF=SF.slice(0,C+1);SF.push(s);C++;try{if(HOK)history.pushState({i:C},'')}catch(e){}updateBack()}
 function render(s){
+ if(s.t==='ADMIN'&&!isAdm()){s={t:'HOME',s:''};SF[C]=s}
  NP=true;
+ logOpen(s);
  var ks=Object.keys(icons);
  nav.querySelectorAll('button').forEach(function(b,i){b.classList.toggle('on',ks[i]===s.t)});
  title.textContent=s.t;show(s.t);
- if(s.s==='upload')showUpload();else if(s.s==='fh')showFreeHours();else if(s.s==='sp')showStationProfile();else if(s.s==='cc')showCommodityClass();else if(s.s==='tally')showTally();else if(s.s==='plc')showPlacement();else if(s.s==='wtr')showWtr();
+ if(s.s==='upload')showUpload();else if(s.s==='fh')showFreeHours();else if(s.s==='sp')showStationProfile();else if(s.s==='cc')showCommodityClass();else if(s.s==='tally')showTally();else if(s.s==='plc')showPlacement();else if(s.s==='wtr')showWtr();else if(s.s==='al'&&isAdm())showActLog();
  else if(s.s==='result'){if(UW.rows.length&&UW.station)processWgn(UW.station);else showUpload()}
  NP=false;updateBack();
 }
@@ -1359,6 +1369,7 @@ function spLookup(){
  }).catch(function(e){spMsg('NOT CHECKED - '+spErr(e),true)});
 }
 function spPost(body){
+ body.sess=AU.sess;body.ip=AU.ip;
  return fetch(STATION_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()}).then(function(j){
   if(!j||!j.ok)throw new Error('SRV:'+((j&&j.error)||'failed'));return j});
 }
@@ -1424,7 +1435,7 @@ function show(k){
  var card=document.querySelector(".card"),gl=document.getElementById("glist");
  gl.classList.remove("wide","pl");document.querySelector("main").classList.remove("top");
  if(k==="ADMIN"){
-  var ai=[['FREE HOURS','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','fh'],['STATION PROFILE','<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>','sp'],['COMMODITY CLASS','<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>','cc']];
+  var ai=[['FREE HOURS','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','fh'],['STATION PROFILE','<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>','sp'],['COMMODITY CLASS','<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>','cc'],['ACTIVITY LOG','<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/>','al']];
   gl.innerHTML='<h3>ADMIN</h3>'+ai.map(function(i){return '<button class="gbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+i[1]+'</svg><span>'+i[0]+'</span></button>'}).join("");
   gl.querySelectorAll(".gbtn").forEach(function(g,k){g.onclick=function(){go({t:'ADMIN',s:ai[k][2]})}});
   gl.hidden=false;card.hidden=true;return;
@@ -1490,11 +1501,14 @@ fhPull();
 var AUTH_API=STATION_API;   // login runs on the same merged Apps Script as Station Profile
 var G_CLIENT_ID='675553256314-hbv9ibguh47cjupnq8j77keb4jjlar8q.apps.googleusercontent.com';        // PASTE: Google OAuth Client ID (xxxx.apps.googleusercontent.com)
 var AUTH_REMEMBER=false;   // false = user must login on every page load
-var USER=null,AU={tok:'',tc:null,mode:'login'};
+var USER=null,AU={tok:'',tc:null,mode:'login',sess:'',ip:''};
+var ADMIN_EMAIL='rjtdivision@gmail.com';
+function isAdm(){return !!(USER&&String(USER.email||'').toLowerCase()===ADMIN_EMAIL)}
 function $a(x){return document.getElementById(x)}
 function authMsg(t,e){var m=$a(!$a('sf').hidden?'sm':!$a('rf').hidden?'rm':'am');if(m){m.textContent=t;m.className='umsg'+(e?' err':'')}}
 function aOn(){return /^https:\/\//.test(AUTH_API)}
 function aPost(b){
+ b.ip=AU.ip;
  if(!aOn())return Promise.reject(new Error('SRV:LOGIN SERVER NOT CONNECTED'));
  return fetch(AUTH_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(j){if(!j||!j.ok)throw new Error('SRV:'+((j&&j.error)||'failed'));return j});
 }
@@ -1506,12 +1520,14 @@ function authInit(){
  if(u&&u.station&&u.email)enterApp(u);else showAuth();
 }
 function enterApp(u){
- USER=u||USER;$a('auth').hidden=true;$a('app').hidden=false;
+ USER=u||USER;
+ var nb=nav.querySelectorAll('button');if(nb.length)nb[nb.length-1].style.display=isAdm()?'':'none';$a('auth').hidden=true;$a('app').hidden=false;
  var d=document.querySelector('#date .d2');
  if(d){if(!d.dataset.day)d.dataset.day=d.textContent;d.textContent=d.dataset.day+(USER&&USER.station?' | '+USER.station:'')}
  fitHdr();
 }
 function authOk(u){
+ AU.sess=u.sess||'';delete u.sess;
  if(AUTH_REMEMBER){try{localStorage.setItem('authUser',JSON.stringify(u))}catch(e){}}
  ['aid','apw','sp1','sp2','rp1','rp2'].forEach(function(k){$a(k).value=''});
  enterApp(u);
@@ -1529,6 +1545,7 @@ function showAuth(){
  setTimeout(function(){$a('aid').focus()},60);
 }
 function doLogout(){
+ logAct('LOGOUT','');AU.sess='';
  try{localStorage.removeItem('authUser')}catch(e){}
  USER=null;UW={rows:[]};
  SF=[{t:'HOME',s:''}];C=0;render(SF[0]);showAuth();
@@ -1643,6 +1660,74 @@ function cpOpen(){
   }).catch(function(x){msg(aErr(x),true);b.disabled=false;g('cpx').disabled=false});
  };
  setTimeout(function(){g('cpo').focus()},60);
+}
+
+// ---- ACTIVITY LOG (client side) ----
+var _fetch=window.fetch.bind(window);
+var SUBN={fh:'FREE HOURS',sp:'STATION PROFILE',cc:'COMMODITY CLASS',al:'ACTIVITY LOG',upload:'UPLOAD WGN NO.',tally:'INWARD TALLY',plc:'PLACEMENT PARTICULARS',wtr:'W.T.R.',result:'WGN RESULT'};
+function logAct(ev,detail){
+ if(!AU.sess)return;
+ try{_fetch(AUTH_API,{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'logActivity',sess:AU.sess,ip:AU.ip,event:ev,detail:String(detail||'').slice(0,300)})}).catch(function(){})}catch(e){}
+}
+function logOpen(s){
+ if(!AU.sess||!s)return;
+ var d=s.t+(s.s?' > '+(SUBN[s.s]||s.s.toUpperCase()):'');
+ logAct(s.t==='ADMIN'&&!s.s?'ADMIN MENU OPENED':s.t==='ADMIN'?'ADMIN PAGE OPENED':'PAGE OPENED',d);
+}
+function actDetail(u,b){
+ var p=[];
+ if(b.rakeId)p.push('RAKE '+b.rakeId);
+ if(b.origDn)p.push('DELIVERY '+b.origDn);
+ if(b.data&&b.data.STATION_CODE)p.push('STATION '+b.data.STATION_CODE);
+ if(b.items&&b.items.length){
+  if(u===COMMODITY_API)p.push(b.items.map(function(x){return x.code+'='+x.cls}).join(', '));
+  else p.push(b.items.map(function(x){return x.key}).join(', '));
+ }
+ if(b.releaseDate)p.push('RELEASE '+b.releaseDate+' '+(b.releaseTime||''));
+ return p.join(' | ').slice(0,300);
+}
+var NOLOG={login:1,gcheck:1,register:1,changePassword:1,resetCheck:1,resetPassword:1,logActivity:1,getLog:1};
+window.fetch=function(u,o){
+ var pr=_fetch.apply(window,arguments);
+ try{
+  if(o&&o.method==='POST'&&typeof o.body==='string'){
+   var b=JSON.parse(o.body),a=b&&b.action;
+   if(a&&!NOLOG[a]){
+    var nm=u===FH_API?'FREE HOURS '+a.toUpperCase():u===COMMODITY_API?'COMMODITY CLASS '+a.toUpperCase():a.replace(/([A-Z])/g,' $1').toUpperCase();
+    pr.then(function(r){return r.clone().json()}).then(function(j){if(j&&j.ok)logAct(nm,actDetail(u,b))}).catch(function(){});
+   }
+  }
+ }catch(e){}
+ return pr;
+};
+(function(){
+ var ok=function(j){if(j&&j.ip&&!AU.ip)AU.ip=String(j.ip).slice(0,45)};
+ _fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(ok).catch(function(){
+  _fetch('https://api64.ipify.org?format=json').then(function(r){return r.json()}).then(ok).catch(function(){})});
+})();
+function showActLog(){
+ var gl=document.getElementById('glist'),$=function(x){return document.getElementById(x)};
+ gl.classList.add('wide');document.querySelector('main').classList.remove('top');
+ gl.innerHTML='<h3>ACTIVITY LOG</h3><div class=gpanel><div class=alb><input id=alq class=gin type=text placeholder="SEARCH USER / IP / EVENT / DETAIL" autocomplete=off><button type=button class=gbtn id=alr>REFRESH</button></div><div id=alm class=umsg></div><div class=alc id=alc></div><div class=alw><table class=alt><thead><tr><th>TIME</th><th>USER</th><th>STN</th><th>IP</th><th>EVENT</th><th>DETAIL</th></tr></thead><tbody id=alt></tbody></table></div></div>';
+ gl.hidden=false;document.querySelector('.card').hidden=true;
+ var data=[];
+ var draw=function(){
+  var q=$('alq').value.trim().toUpperCase(),n=0,h='';
+  data.forEach(function(r){
+   if(q&&r.join(' ').toUpperCase().indexOf(q)<0)return;
+   n++;
+   var cls=/ADMIN/.test(r[4])?'adm':/FAILED|BLOCKED|DENIED/.test(r[4])?'bad':'';
+   h+='<tr class="'+cls+'"><td class=t>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td class=i>'+esc(r[3])+'</td><td>'+esc(r[4])+'</td><td>'+esc(r[5])+'</td></tr>';
+  });
+  $('alt').innerHTML=h||'<tr><td colspan=6>NO RECORDS</td></tr>';
+  $('alc').textContent='SHOWING '+n+' OF '+data.length+' (LATEST FIRST)';
+ };
+ var load=function(){
+  var m=$('alm');m.className='umsg';m.textContent='LOADING...';$('alr').disabled=true;
+  aPost({action:'getLog',sess:AU.sess,limit:500}).then(function(j){data=j.rows||[];m.textContent='';draw()})
+  .catch(function(e){m.className='umsg err';m.textContent=aErr(e)}).then(function(){var b=$('alr');if(b)b.disabled=false});
+ };
+ $('alr').onclick=load;$('alq').oninput=draw;load();
 }
 function bindAuth(){
  $a('lf').onsubmit=function(e){
