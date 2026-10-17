@@ -542,7 +542,7 @@ function loadStations(f){
   var seen={},st=[];
   rows.slice(hi+1).forEach(function(x){var v=String(x[k]==null?'':x[k]).trim().toUpperCase();if(v&&!seen[v]){seen[v]=1;st.push(v)}});
   if(!st.length){umsg('NO STATION CODE FOUND IN STTN TO',true);return}
-  if(USER&&USER.station){st=st.filter(function(v){return v===USER.station});if(!st.length){umsg('NO DATA IN THIS FILE FOR YOUR STATION ('+USER.station+')',true);return}}
+  if(USER&&USER.station&&!isAdm()){st=st.filter(function(v){return v===USER.station});if(!st.length){umsg('NO DATA IN THIS FILE FOR YOUR STATION ('+USER.station+')',true);return}}
   UW.rows=rows;
   w.innerHTML=st.length===1?'<label class=stl for=stIn>STATION CODE (AUTO)</label><input id=stIn class=gina type=text readonly value="'+esc(st[0])+'">':'<label class=stl for=stIn>SELECT STATION CODE</label><select id=stIn class=gin>'+st.map(function(v){return '<option>'+esc(v)+'</option>'}).join('')+'</select>';document.getElementById('urow').hidden=false;
  };
@@ -1565,7 +1565,7 @@ function enterApp(u){
  USER=u||USER;
  var nb=nav.querySelectorAll('button');if(nb.length)nb[nb.length-1].style.display=isAdm()?'':'none';$a('auth').hidden=true;$a('app').hidden=false;
  var d=document.querySelector('#date .d2');
- if(d){if(!d.dataset.day)d.dataset.day=d.textContent;d.textContent=d.dataset.day+(USER&&USER.station?' | '+USER.station:'')}
+ if(d){if(!d.dataset.day)d.dataset.day=d.textContent;d.textContent=d.dataset.day+(isAdm()?' | ALL STATIONS':USER&&USER.station?' | '+USER.station:'')}
  var ui=$a('uid');
  if(ui&&USER){ui.innerHTML='<b></b><i></i>';ui.firstChild.textContent=USER.name||'';ui.lastChild.textContent=USER.email||''}
  fitHdr();
