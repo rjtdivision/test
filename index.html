@@ -317,6 +317,12 @@ main:has(.glist.pl:not([hidden])){padding:4px}
 #tcf .cpf{display:flex;flex-direction:column;gap:12px;text-align:left}
 #tcf .cpf .urow{display:flex;gap:10px}
 #tcf .cpf .urow .gbtn{flex:1}
+.hr{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0}
+.uid{text-align:right;line-height:1.25;max-width:230px;overflow:hidden}
+.uid b{display:block;color:#fff;font-size:11px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uid i{display:block;font-style:normal;color:#9FDCEB;font-size:10px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uid:empty{display:none}
+@media (max-width:600px){.uid i{display:none}.uid{max-width:110px}}
 </style>
 </head>
 <body>
@@ -385,7 +391,7 @@ main:has(.glist.pl:not([hidden])){padding:4px}
  <header>
   <span class="plate"><div class="logo lg-l" role="img" aria-label="Indian Railways"></div><div class="logo lg-d" role="img" aria-label="Indian Railways"></div></span>
   <div class="t"><b id="hb1">RAJKOT DIVISION</b><small class="sd">COMMERCIAL DEPARTMENT (GOODS)</small><small class="sm" id="hb2">COMMERCIAL DEPARTMENT</small><small class="sm" id="hb3">GOODS</small></div>
-  <span class="date" id="date"></span>
+  <div class="hr"><span class="date" id="date"></span><div class="uid" id="uid"></div></div>
   <button id="cpBtn" class="hb" type="button" aria-label="Change password" title="Change password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
   <button id="outBtn" class="hb" type="button" aria-label="Logout" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button>
   <button id="themeBtn" aria-label="Change theme"></button>
@@ -495,7 +501,7 @@ function processWgn(st){
  var fh=freeHours(rt,wc);
  var wc0=g(f[0],'WAGON TYPE').toUpperCase(),TY={BO:'OPEN WAGON',BC:'COVER WAGON',BT:'TANK WAGON',BL:'CONTAINER'},tn=TY[wc0.substring(0,2)];
  var tcell=tn?tn:'<select id=wtype class=gin><option value="" selected disabled>SELECT TYPE</option>'+['OPEN WAGON','COVER WAGON','TANK WAGON','CONTAINER'].map(function(v){return '<option>'+v+'</option>'}).join('')+'</select>';
- var R=[['RAKE ID',rid],['RAKE TYPE',rt],['WAGON CODE',wty],['TYPE OF WAGON','',tcell],['STATION FROM',from],['STATION TO',st],['NO. OF WAGONS',wc],['INVOICE NO.',invD],['INVOICE DATE',idate],['ACTUAL WEIGHT (TONNE)',wt.toFixed(2)],['CONSIGNER',g(f[0],'CNSR')],['CONSIGNEE',g(f[0],'CNSG')],['COMMODITY CODE',g(f[0],'CMDT')]];
+ var R=[['RAKE ID',rid],['RAKE TYPE',rt],['WAGON CODE',wty],['TYPE OF WAGON','',tcell],['STATION FROM',from],['STATION TO',st],['NO. OF WAGONS',wc],['INVOICE NO.',invD],['INVOICE DATE',idate],['ACTUAL WEIGHT (TONNE)',wt.toFixed(2)],['CONSIGNER',g(f[0],'CNSR')],['CONSIGNEE',g(f[0],'CNSG')],['COMMODITY CODE',g(f[0],'CMDT'),esc(g(f[0],'CMDT'))+' <button type=button id=ccv class=wnb disabled>(...)</button>']];
  var gl=document.getElementById('glist');
  gl.innerHTML='<h3>UPLOAD WGN NO.</h3><div class=gpanel><table class=sum>'+R.map(function(a){return '<tr><td>'+a[0]+'</td><td>'+(a[2]||esc(a[1]))+'</td></tr>'}).join('')
  +'<tr><td>WAGON SUMMARY</td><td><textarea id=wj class=gin>'+esc(wsum)+'</textarea></td></tr><tr><td>FREE HOURS</td><td id=fhv>--</td></tr><tr><td>TYPE OF LOADING</td><td id=tlv>--</td></tr></table><div id=rsm class=umsg></div><div class=urow><button type=button class="gbtn" id=sbk>BACK</button><button type=button class="gbtn pri" id=ssb>SUBMIT</button></div></div>';
@@ -520,7 +526,7 @@ $('ssb').onclick=function(){
  }).catch(function(e){var m=String(e&&e.message||'');msg(m.indexOf('SRV:')===0?'NOT SAVED - '+m.slice(4).toUpperCase().slice(0,80):'NOT SAVED - CHECK INTERNET AND TRY AGAIN',true)}).then(function(){btn.disabled=false});
 };
  setLoading(tn||'');var wsel=$('wtype');window.RS={tn:tn||'',code:wty,rt:rt,wc:wc};updFH();if(wsel)wsel.onchange=function(){setLoading(wsel.value);updFH()};$('tlv').onchange=updFH;
- window.scrollTo(0,0);UW.station=st;if(!NP)hpush({t:'INWARD',s:'result'});updateBack();
+ ccResolve(String(g(f[0],'CMDT')).trim().toUpperCase());window.scrollTo(0,0);UW.station=st;if(!NP)hpush({t:'INWARD',s:'result'});updateBack();
 }
 function loadStations(f){
  var w=document.getElementById('stwrap');w.innerHTML='';UW.rows=[];document.getElementById('urow').hidden=true;
@@ -1229,6 +1235,42 @@ function tallyClass(id){
   set(cl,'NOT DEFINED');
  }).catch(function(){set('','NOT LOADED')});
 }
+function ccResolve(code){
+ var set=function(t,ok,fn){var x=document.getElementById('ccv');if(!x)return;x.textContent=t;x.disabled=!fn;x.style.color=ok?'var(--ct)':'#E5484D';x.onclick=fn||null};
+ var done=function(c){set('('+c+')',true,null);if(window.RS)window.RS.cls=c};
+ if(!code){set('(NO CODE)',false,null);return}
+ if(!ccOk()){set('(NOT CONNECTED)',false,null);return}
+ set('(LOADING...)',true,null);
+ ccLoad().then(function(items){
+  var cl='';items.forEach(function(x){if(x.code===code)cl=x.cls});
+  if(cl)done(cl);
+  else{set('(CLASS NOT DEFINED - TAP TO ENTER)',false,function(){ccAsk(code,done)});ccAsk(code,done)}
+ }).catch(function(){set('(NOT LOADED - TAP TO RETRY)',false,function(){ccResolve(code)})});
+}
+function ccAsk(code,done){
+ var o=document.getElementById('tcf');
+ if(!o){o=document.createElement('div');o.id='tcf';document.body.appendChild(o)}
+ o.innerHTML='<div class=dc role=dialog aria-modal=true aria-labelledby=ccT><div class=di><svg viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=2.4 stroke-linecap=round stroke-linejoin=round><rect x=3 y=7 width=18 height=13 rx=2></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div><h3 id=ccT>COMMODITY CLASS</h3><p>CLASS NOT DEFINED FOR '+esc(code)+'</p>'
+ +'<div class=cpf><div class=fld><label class=stl for=cci>ENTER COMMODITY CLASS</label><input id=cci class=gin type=text maxlength=20 autocomplete=off></div>'
+ +'<div id=ccm class=umsg></div><div class=urow><button type=button class=gbtn id=ccx>LATER</button><button type=button class="gbtn pri" id=ccok>SAVE</button></div></div></div>';
+ o.hidden=false;
+ var g=function(x){return document.getElementById(x)},close=function(){o.hidden=true;o.innerHTML=''};
+ var inp=g('cci');
+ inp.oninput=function(){var v=inp.value.toUpperCase().replace(/[^A-Z0-9 \/.\-()&_]/g,'');if(v!==inp.value)inp.value=v};
+ inp.onkeydown=function(e){if(e.key==='Enter')g('ccok').click()};
+ g('ccx').onclick=close;
+ g('ccok').onclick=function(){
+  var v=inp.value.trim().toUpperCase(),m=g('ccm'),b=this;
+  if(!v){m.textContent='ENTER COMMODITY CLASS';m.className='umsg err';return}
+  b.disabled=true;m.textContent='SAVING...';m.className='umsg';
+  fetch(COMMODITY_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'save',items:[{code:code,cls:v}]})})
+  .then(function(r){return r.json()}).then(function(j){
+   if(!j||!j.ok)throw new Error('SRV:'+((j&&j.error)||'failed'));
+   close();done(v);
+  }).catch(function(e){m.textContent=ccErr(e);m.className='umsg err';b.disabled=false});
+ };
+ setTimeout(function(){try{inp.focus()}catch(e){}},50);
+}
 function showCommodityClass(){
  var gl=document.getElementById('glist');
  gl.classList.remove('wide');document.querySelector('main').classList.remove('top');
@@ -1524,6 +1566,8 @@ function enterApp(u){
  var nb=nav.querySelectorAll('button');if(nb.length)nb[nb.length-1].style.display=isAdm()?'':'none';$a('auth').hidden=true;$a('app').hidden=false;
  var d=document.querySelector('#date .d2');
  if(d){if(!d.dataset.day)d.dataset.day=d.textContent;d.textContent=d.dataset.day+(USER&&USER.station?' | '+USER.station:'')}
+ var ui=$a('uid');
+ if(ui&&USER){ui.innerHTML='<b></b><i></i>';ui.firstChild.textContent=USER.name||'';ui.lastChild.textContent=USER.email||''}
  fitHdr();
 }
 function authOk(u){
@@ -1547,7 +1591,7 @@ function showAuth(){
 function doLogout(){
  logAct('LOGOUT','');AU.sess='';
  try{localStorage.removeItem('authUser')}catch(e){}
- USER=null;UW={rows:[]};
+ USER=null;UW={rows:[]};if($a('uid'))$a('uid').innerHTML='';
  SF=[{t:'HOME',s:''}];C=0;render(SF[0]);showAuth();
 }
 function gStart(mode){
