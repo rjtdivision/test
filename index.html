@@ -443,7 +443,7 @@ function render(s){
  var ks=Object.keys(icons);
  nav.querySelectorAll('button').forEach(function(b,i){b.classList.toggle('on',ks[i]===s.t)});
  title.textContent=s.t;show(s.t);
- if(s.s==='upload')showUpload();else if(s.s==='fh')showFreeHours();else if(s.s==='sp')showStationProfile();else if(s.s==='cc')showCommodityClass();else if(s.s==='tally')showTally();else if(s.s==='plc')showPlacement();else if(s.s==='wtr')showWtr();else if(s.s==='al'&&isAdm())showActLog();
+ if(s.s==='upload')showUpload();else if(s.s==='fh')showFreeHours();else if(s.s==='sp')showStationProfile();else if(s.s==='cc')showCommodityClass();else if(s.s==='tally')showTally();else if(s.s==='plc')showPlacement();else if(s.s==='wtr')showWtr();else if(s.s==='al'&&isAdm())showActLog();else if(s.s==='ud'&&isAdm())showUserList();
  else if(s.s==='result'){if(UW.rows.length&&UW.station)processWgn(UW.station);else showUpload()}
  NP=false;updateBack();
 }
@@ -1477,7 +1477,7 @@ function show(k){
  var card=document.querySelector(".card"),gl=document.getElementById("glist");
  gl.classList.remove("wide","pl");document.querySelector("main").classList.remove("top");
  if(k==="ADMIN"){
-  var ai=[['FREE HOURS','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','fh'],['STATION PROFILE','<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>','sp'],['COMMODITY CLASS','<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>','cc'],['ACTIVITY LOG','<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/>','al']];
+  var ai=[['FREE HOURS','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','fh'],['STATION PROFILE','<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>','sp'],['COMMODITY CLASS','<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>','cc'],['ACTIVITY LOG','<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/>','al'],['USER DETAILS','<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c2 .7 3.5 2.6 3.5 5.5"/>','ud']];
   gl.innerHTML='<h3>ADMIN</h3>'+ai.map(function(i){return '<button class="gbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+i[1]+'</svg><span>'+i[0]+'</span></button>'}).join("");
   gl.querySelectorAll(".gbtn").forEach(function(g,k){g.onclick=function(){go({t:'ADMIN',s:ai[k][2]})}});
   gl.hidden=false;card.hidden=true;return;
@@ -1708,7 +1708,7 @@ function cpOpen(){
 
 // ---- ACTIVITY LOG (client side) ----
 var _fetch=window.fetch.bind(window);
-var SUBN={fh:'FREE HOURS',sp:'STATION PROFILE',cc:'COMMODITY CLASS',al:'ACTIVITY LOG',upload:'UPLOAD WGN NO.',tally:'INWARD TALLY',plc:'PLACEMENT PARTICULARS',wtr:'W.T.R.',result:'WGN RESULT'};
+var SUBN={fh:'FREE HOURS',sp:'STATION PROFILE',cc:'COMMODITY CLASS',al:'ACTIVITY LOG',ud:'USER DETAILS',upload:'UPLOAD WGN NO.',tally:'INWARD TALLY',plc:'PLACEMENT PARTICULARS',wtr:'W.T.R.',result:'WGN RESULT'};
 function logAct(ev,detail){
  if(!AU.sess)return;
  try{_fetch(AUTH_API,{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'logActivity',sess:AU.sess,ip:AU.ip,event:ev,detail:String(detail||'').slice(0,300)})}).catch(function(){})}catch(e){}
@@ -1730,7 +1730,7 @@ function actDetail(u,b){
  if(b.releaseDate)p.push('RELEASE '+b.releaseDate+' '+(b.releaseTime||''));
  return p.join(' | ').slice(0,300);
 }
-var NOLOG={login:1,gcheck:1,register:1,changePassword:1,resetCheck:1,resetPassword:1,logActivity:1,getLog:1};
+var NOLOG={login:1,gcheck:1,register:1,changePassword:1,resetCheck:1,resetPassword:1,logActivity:1,getLog:1,getUsers:1};
 window.fetch=function(u,o){
  var pr=_fetch.apply(window,arguments);
  try{
@@ -1749,6 +1749,29 @@ window.fetch=function(u,o){
  _fetch('https://api.ipify.org?format=json').then(function(r){return r.json()}).then(ok).catch(function(){
   _fetch('https://api64.ipify.org?format=json').then(function(r){return r.json()}).then(ok).catch(function(){})});
 })();
+function showUserList(){
+ var gl=document.getElementById('glist'),$=function(x){return document.getElementById(x)};
+ gl.classList.add('wide');document.querySelector('main').classList.remove('top');
+ gl.innerHTML='<h3>USER DETAILS</h3><div class=gpanel><div class=alb><input id=udq class=gin type=text placeholder="SEARCH NAME / E-MAIL / STATION" autocomplete=off><button type=button class=gbtn id=udr>REFRESH</button></div><div id=udm class=umsg></div><div class=alc id=udc></div><div class=alw><table class=alt><thead><tr><th>#</th><th>NAME</th><th>E-MAIL</th><th>STATION</th><th>ACCOUNT CREATED</th><th>LAST LOGIN</th><th>PASSWORD</th></tr></thead><tbody id=udt></tbody></table></div></div>';
+ gl.hidden=false;document.querySelector('.card').hidden=true;
+ var data=[];
+ var draw=function(){
+  var q=$('udq').value.trim().toUpperCase(),n=0,h='';
+  data.forEach(function(r){
+   if(q&&[r.name,r.email,r.station].join(' ').toUpperCase().indexOf(q)<0)return;
+   n++;
+   h+='<tr><td>'+n+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.email)+'</td><td>'+esc(r.station)+'</td><td class=t>'+esc(r.created||'--')+'</td><td class=t>'+esc(r.last||'NEVER')+'</td><td class=t>'+(r.hasPw?'&#9679;&#9679;&#9679;&#9679;&#9679;&#9679; (ENCRYPTED)':'NOT SET')+'</td></tr>';
+  });
+  $('udt').innerHTML=h||'<tr><td colspan=7>NO USERS</td></tr>';
+  $('udc').textContent='SHOWING '+n+' OF '+data.length+' USERS';
+ };
+ var load=function(){
+  var m=$('udm');m.className='umsg';m.textContent='LOADING...';$('udr').disabled=true;
+  aPost({action:'getUsers',sess:AU.sess}).then(function(j){data=j.users||[];m.textContent='';draw()})
+  .catch(function(e){m.className='umsg err';m.textContent=aErr(e)}).then(function(){var b=$('udr');if(b)b.disabled=false});
+ };
+ $('udr').onclick=load;$('udq').oninput=draw;load();
+}
 function showActLog(){
  var gl=document.getElementById('glist'),$=function(x){return document.getElementById(x)};
  gl.classList.add('wide');document.querySelector('main').classList.remove('top');
